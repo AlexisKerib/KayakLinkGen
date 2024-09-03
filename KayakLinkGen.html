@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Search</title>
+</head>
+
+<body>
+    <form id="flightSearchForm">
+        <label for="departTo">Depart To:</label><br>
+        <div id="departToContainer"></div><br>
+
+        <label for="departDate">Depart Date:</label><br>
+        <select id="departDate" name="departDate"></select><br><br>
+
+        <label for="returnFrom">Return From:</label><br>
+        <div id="returnFromContainer"></div><br>
+
+        <label for="returnDate">Return Date:</label><br>
+        <select id="returnDate" name="returnDate"></select><br><br>
+
+        <label for="airlines">Airlines:</label><br>
+        <select id="airlines" name="airlines"></select><br><br>
+
+        <button type="button" onclick="generateLink()">Generate Link</button>
+    </form>
+
+    <div id="generatedLink"></div>
+
+    <script>
+        const destinationsJp = ["CTS", "AKJ", "HKD", "AXT", "HNA", "FKS", "SDJ", "IBR", "NRT", "HND", "KIJ", "KMQ", "NGO", "KIX", "OKJ", "KCZ", "FUK", "HSG", "OKA"]
+        const destinationsSea = ["BKK", "DMK", "CNX", "HDY", "HKT", "KBV", "LGK", "AOR", "PEN", "IPH", "KUL", "SIN", "PQC"];
+        const destinationsSeaVisa = ["HAN", "DAD", "SGN", "CRK", "MNL", "CEB", "BWN", "PNH", "CGK", "DPS"];
+        const dates = [
+            "",
+            "2024-09-14-flexible-1day-before",
+            "2024-10-10-flexible-1day-before",
+            "2024-10-23-flexible-1day",
+            "2024-10-09-flexible-1day",
+            "2024-10-09-flexible-2days",
+            "2024-12-28-flexible-2days",
+            "2024-12-28-flexible-1day",
+            "2025-01-01-flexible-1day",
+            "2025-02-15-flexible-1day-before",
+        ];
+        const returnDates = [
+            "",
+            "2024-09-17",
+            "2024-09-17-flexible-1day-after",
+            "2024-10-13-flexible-1day-after",
+            "2024-10-27-flexible-1day-after",
+            "2024-10-14-flexible-1day",
+            "2024-10-14-flexible-2days",
+            "2025-01-01-flexible-1day",
+            "2025-01-02",
+            "2025-01-05-flexible-1day",
+        ];
+        const airlinesOptions = [
+            "-3U,PR,TW,HO,HU,HX,BX,Z2,MF,UO,MU,9C,ZH,5J,FM,NX,KE,CA,7C,CX,CZ,HB,LJ", "QH,MH,AC,AE,EK,B7,VN,NH,VU,BC,JL,JX,BR,SQ,CI,H1,TG,TK,PG"
+        ];
+        function createCheckbox(containerId, name, values) {
+            const container = document.getElementById(containerId);
+            values.forEach(value => {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `${name}-${value}`;
+                checkbox.name = name;
+                checkbox.value = value;
+
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.textContent = value;
+
+                container.appendChild(checkbox);
+                container.appendChild(label);
+                container.appendChild(document.createElement('br'));
+            });
+        }
+        function createCheckboxTable(containerId, name, values_list) {
+            // Number of columes is the number of values
+            // Number of rows is the max length of values in values_list
+            // The table shows as:
+            // | --- | --- | --- |
+            // | CTS | BKK | HAN |
+            // | AKJ | DMK | DAD |
+            // | HKD | CNX | SGN |
+            // | ... | ... | ... |
+            // | --- | --- | --- |
+
+            const container = document.getElementById(containerId);
+            const table = document.createElement('table');
+            const headerRow = document.createElement('tr');
+
+            // Create header row with "Select All" checkboxes
+            values_list.forEach((values, colIndex) => {
+                const headerCell = document.createElement('th');
+                const selectAllCheckbox = document.createElement('input');
+                selectAllCheckbox.type = 'checkbox';
+                selectAllCheckbox.id = `${name}-selectAll-${colIndex}`;
+                selectAllCheckbox.addEventListener('change', function () {
+                    const checkboxes = document.querySelectorAll(`input[name="${name}"][data-col="${colIndex}"]`);
+                    checkboxes.forEach(checkbox => checkbox.checked = selectAllCheckbox.checked);
+                });
+
+                const label = document.createElement('label');
+                label.htmlFor = selectAllCheckbox.id;
+                label.textContent = 'Select All';
+
+                headerCell.appendChild(selectAllCheckbox);
+                headerCell.appendChild(label);
+                headerRow.appendChild(headerCell);
+            });
+
+            table.appendChild(headerRow);
+
+            // Determine the number of rows needed
+            const numRows = Math.max(...values_list.map(values => values.length));
+
+            for (let i = 0; i < numRows; i++) {
+                const row = document.createElement('tr');
+
+                for (let j = 0; j < values_list.length; j++) {
+                    const cell = document.createElement('td');
+                    const value = values_list[j][i];
+
+                    if (value !== undefined) {
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.id = `${name}-${value}`;
+                        checkbox.name = name;
+                        checkbox.value = value;
+                        checkbox.setAttribute('data-col', j);
+
+                        const label = document.createElement('label');
+                        label.htmlFor = checkbox.id;
+                        label.textContent = value;
+
+                        cell.appendChild(checkbox);
+                        cell.appendChild(label);
+                    }
+                    row.appendChild(cell);
+                }
+                table.appendChild(row);
+            }
+            container.appendChild(table);
+        }
+
+        function populateSelect(selectId, options) {
+            const select = document.getElementById(selectId);
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                select.appendChild(opt);
+            });
+        }
+
+        createCheckboxTable('departToContainer', 'departTo', [destinationsJp, destinationsSea, destinationsSeaVisa]);
+        createCheckboxTable('returnFromContainer', 'returnFrom', [destinationsJp, destinationsSea, destinationsSeaVisa]);
+        populateSelect('departDate', dates);
+        populateSelect('returnDate', returnDates);
+        populateSelect('airlines', airlinesOptions);
+
+        function generateLink() {
+            const departTo = Array.from(document.querySelectorAll('input[name="departTo"]:checked')).map(e => e.value).join(',');
+            const departDate = document.getElementById("departDate").value;
+            const returnFrom = Array.from(document.querySelectorAll('input[name="returnFrom"]:checked')).map(e => e.value).join(',');
+            const returnDate = document.getElementById("returnDate").value;
+            const airlines = document.getElementById("airlines").value;
+
+            const departToStr = departTo ? `/TPE-${departTo}` : '';
+            const departtDateStr = departDate ? `/${departDate}` : '';
+            const returnToStr = returnFrom ? `/${returnFrom}-TPE` : '';
+            const returntDateStr = returnDate ? `/${returnDate}` : '';
+
+            const link = `https://www.tw.kayak.com/flights${departToStr}${departtDateStr}${returnToStr}${returntDateStr}/?&sort=price_a&fs=airlines=${airlines}`;
+            document.getElementById("generatedLink").innerHTML = `<a href="${link}" target="_blank">${link}</a>`;
+        }
+
+    </script>
+</body>
+
+</html>
