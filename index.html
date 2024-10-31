@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight Search</title>
+    <title>KayakLinkGen</title>
 </head>
 
 <body>
@@ -37,11 +37,6 @@
         const destinationsSeaVisa = ["HAN", "DAD", "SGN", "CRK", "MNL", "CEB", "BWN", "PNH", "CGK", "DPS"];
         const dates = [
             "",
-            "2024-12-27-flexible-2days",
-            "2024-12-28-flexible-1day",
-            "2024-12-28-flexible-2days",
-            "2025-01-01-flexible-1day",
-            "2025-02-15-flexible-1day-before",
             "2025-02-22-flexible-1day-before",
             "2025-02-28-flexible-1day-before",
             "2025-03-29-flexible-1day-before",
@@ -53,10 +48,6 @@
         ];
         const returnDates = [
             "",
-            "2025-01-01-flexible-1day-after",
-            "2025-01-02",
-            "2025-01-05-flexible-1day",
-            "2025-02-14-flexible-1day",
             "2025-03-02-flexible-1day-after",
             "2025-04-06-flexible-1day-after",
             "2025-05-04-flexible-1day-after",
@@ -64,7 +55,7 @@
             "2025-10-12-flexible-1day-after",
         ];
         const airlinesOptions = [
-            "-3U,PR,TW,HO,HU,HX,BX,Z2,MF,UO,MU,9C,ZH,5J,FM,NX,KE,CA,7C,CX,CZ,HB,LJ", "QH,MH,AC,AE,EK,B7,VN,NH,VU,BC,JL,JX,BR,SQ,CI,H1,TG,TK,PG"
+            "-3U,PR,TW,HO,HU,HX,BX,Z2,MF,UO,MU,9C,ZH,5J,FM,NX,KE,CA,OZ,7C,CX,CZ,HB,LJ", "QH,MH,AC,AE,EK,B7,VN,NH,VU,BC,JL,JX,BR,SQ,CI,H1,TG,TK,PG"
         ];
         function createCheckbox(containerId, name, values) {
             const container = document.getElementById(containerId);
