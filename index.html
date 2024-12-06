@@ -30,11 +30,79 @@
     <div id="generatedLink"></div>
 
     <script>
-        const destinationsJp = ["CTS", "AKJ", "HKD", "AXT", "HNA", "FKS", "SDJ", "IBR", "NRT", "HND", "KIJ", "KMQ", "NGO", "KIX", "OKJ", "KCZ"]
-        const destinationsJp2 = ["WKJ", "MMB", "AKJ", "AOJ", "HNA", "SYO", "FZS", "NMK", "ITM", "UKB"]
-        const destinationsJpKyu = ["FUK", "KKJ", "OIT", "HSG", "NGS", "KMJ", "AXJ", "KMI", "KOJ", "OKA"]
-        const destinationsSea = ["CNX", "BKK", "DMK", "HKT", "KBV", "HDY", "LGK", "AOR", "PEN", "IPH", "KUL", "SIN", "PQC"];
-        const destinationsSeaVisa = ["HAN", "DAD", "SGN", "CRK", "MNL", "CEB", "BWN", "PNH", "CGK", "DPS"];
+        const destHokkaido = [
+            "WKJ_稚内+", // 45.41
+            "MMB_女満別+", // 43.90
+            "MBE_紋別+",  // 44.35
+            "AKJ_旭川",  // 43.30
+            "SHB_中標津+", // 43.55
+            "KUH_釧路+", // 43.00
+            "OBO_帯広+", // 42.92
+            "CTS_新千歳", // 42.78
+            "HKD_函館",  // 41.77
+        ];
+        const destTohoku = [
+            "MSJ_三沢+", // 40.69
+            "AOJ_青森", // 40.82
+            "ONJ_大館能代+", // 40.20
+            "AXT_秋田", // 39.72
+            "HNA_花巻", // 39.42
+            "SYO_庄内+", // 38.81
+            "GAJ_山形+", // 38.39
+            "SDJ_仙台", // 38.26
+            "FKS_福島", // 37.23
+            "IBR_小美玉", // 36.17
+        ];
+        const destKanto = [
+            "HND_羽田",
+            "NRT_成田",
+            "HAC_八丈島+"
+        ];
+        const destChubu = [
+            "KIJ_新潟", // 37.91
+            "NTQ_能登+", // 37.32
+            "TOY_富山+", // 36.65
+            "KMQ_小松", // 36.39
+            "NGO_中部国際", // 34.98
+        ];
+        const destKinki = [
+            "KIX_関西",
+            "ITM_大阪+",
+            "UKB_神戸",
+            "SHM_南紀白浜+"
+        ];
+        const destChugokuShikoku = [
+            "TTJ_鳥取+", // 35.52
+            "YGJ_米子+", // 35.49
+            "IZO_出雲+", // 35.37
+            "OKJ_岡山", // 34.78
+            "HIJ_広島", // 34.43
+            "IWJ_萩・石見+", // 34.38
+            "UBJ_山口宇部+", // 33.93
+            "IWK_岩国+", // 34.18
+            "TAK_高松", // 34.34
+            "TKS_徳島+", // 34.12
+            "MYJ_松山", // 33.82
+            "KCZ_高知", // 33.55
+        ];
+        const destKyushuOkinawa = [
+            "FUK_福岡", // 33.59
+            "HSG_佐賀", // 33.24
+            "KKJ_北九州+", // 33.85
+            "OIT_大分+", // 33.23
+            "NGS_長崎+", // 32.75
+            "KMJ_熊本", // 32.82
+            "KMI_宮崎", // 31.86
+            "KOJ_鹿児島+", // 31.80
+            "ASJ_奄美+", // 28.43
+            "OKA_那覇", // 26.21
+            "UEO_久米島+", // 26.35
+            "MMY_宮古+", // 24.79
+            "SHI_下地島+", // 24.75
+            "ISG_石垣+"  // 24.34
+        ];
+        const destSea = ["CNX", "BKK", "DMK", "HKT", "KBV", "HDY", "LGK", "AOR", "PEN", "IPH", "KUL", "SIN", "PQC"];
+        const destSeaVisa = ["HAN", "DAD", "SGN", "CRK", "MNL", "CEB", "BWN", "PNH", "CGK", "DPS"];
         const dates = [
             "",
             "2025-02-22-flexible-1day-before",
@@ -62,25 +130,7 @@
         const airlinesOptions = [
             "-3U,PR,TW,HO,HU,HX,BX,Z2,MF,UO,MU,9C,ZH,5J,FM,NX,KE,CA,OZ,7C,CX,CZ,HB,LJ", "QH,MH,AC,AE,EK,B7,VN,NH,VU,BC,JL,JX,BR,SQ,CI,H1,TG,TK,PG"
         ];
-        function createCheckbox(containerId, name, values) {
-            const container = document.getElementById(containerId);
-            values.forEach(value => {
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = `${name}-${value}`;
-                checkbox.name = name;
-                checkbox.value = value;
-
-                const label = document.createElement('label');
-                label.htmlFor = checkbox.id;
-                label.textContent = value;
-
-                container.appendChild(checkbox);
-                container.appendChild(label);
-                container.appendChild(document.createElement('br'));
-            });
-        }
-        function createCheckboxTable(containerId, name, values_list) {
+        function createCheckboxTable(containerId, name, IATAsList) {
             // Number of columes is the number of values
             // Number of rows is the max length of values in values_list
             // The table shows as:
@@ -96,7 +146,7 @@
             const headerRow = document.createElement('tr');
 
             // Create header row with "Select All" checkboxes
-            values_list.forEach((values, colIndex) => {
+            IATAsList.forEach((IATAs, colIndex) => {
                 const headerCell = document.createElement('th');
                 const selectAllCheckbox = document.createElement('input');
                 selectAllCheckbox.type = 'checkbox';
@@ -118,26 +168,26 @@
             table.appendChild(headerRow);
 
             // Determine the number of rows needed
-            const numRows = Math.max(...values_list.map(values => values.length));
+            const numRows = Math.max(...IATAsList.map(IATAs => IATAs.length));
 
             for (let i = 0; i < numRows; i++) {
                 const row = document.createElement('tr');
 
-                for (let j = 0; j < values_list.length; j++) {
+                for (let j = 0; j < IATAsList.length; j++) {
                     const cell = document.createElement('td');
-                    const value = values_list[j][i];
+                    const IATA = IATAsList[j][i];
 
-                    if (value !== undefined) {
+                    if (IATA !== undefined) {
                         const checkbox = document.createElement('input');
                         checkbox.type = 'checkbox';
-                        checkbox.id = `${name}-${value}`;
+                        checkbox.id = `${name}-${IATA}`;
                         checkbox.name = name;
-                        checkbox.value = value;
+                        checkbox.value = IATA.split("_")[0];
                         checkbox.setAttribute('data-col', j);
 
                         const label = document.createElement('label');
                         label.htmlFor = checkbox.id;
-                        label.textContent = value;
+                        label.textContent = IATA;
 
                         cell.appendChild(checkbox);
                         cell.appendChild(label);
@@ -159,8 +209,8 @@
             });
         }
 
-        createCheckboxTable('departToContainer', 'departTo', [destinationsJp, destinationsJp2, destinationsJpKyu, destinationsSea, destinationsSeaVisa]);
-        createCheckboxTable('returnFromContainer', 'returnFrom', [destinationsJp, destinationsJp2, destinationsJpKyu, destinationsSea, destinationsSeaVisa]);
+        createCheckboxTable('departToContainer', 'departTo', [destHokkaido, destTohoku, destKanto, destChubu, destKinki, destChugokuShikoku, destKyushuOkinawa, destSea, destSeaVisa]);
+        createCheckboxTable('returnFromContainer', 'returnFrom', [destHokkaido, destTohoku, destKanto, destChubu, destKinki, destChugokuShikoku, destKyushuOkinawa, destSea, destSeaVisa]);
         populateSelect('departDate', dates);
         populateSelect('returnDate', returnDates);
         populateSelect('airlines', airlinesOptions);
