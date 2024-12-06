@@ -148,6 +148,7 @@
             // Create header row with "Select All" checkboxes
             IATAsList.forEach((IATAs, colIndex) => {
                 const headerCell = document.createElement('th');
+                headerCell.style.textAlign = 'left';
                 const selectAllCheckbox = document.createElement('input');
                 selectAllCheckbox.type = 'checkbox';
                 selectAllCheckbox.id = `${name}-selectAll-${colIndex}`;
