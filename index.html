@@ -220,6 +220,7 @@
             });
         }
 
+        createCheckboxTable('departFromContainer', 'departFrom', [["TPE", "TSA", "RMQ", "KHH"]]);
         createCheckboxTable('departToContainer', 'departTo', [destHokkaido, destTohoku, destKanto, destChubu, destKinki, destChugokuShikoku, destKyushuOkinawa, destSea, destSeaVisa]);
         createCheckboxTable('returnFromContainer', 'returnFrom', [destHokkaido, destTohoku, destKanto, destChubu, destKinki, destChugokuShikoku, destKyushuOkinawa, destSea, destSeaVisa]);
         populateSelect('departDate', dates);
@@ -227,15 +228,16 @@
         populateSelect('airlines', airlinesOptions);
 
         function generateLink() {
+            const departFrom = Array.from(document.querySelectorAll('input[name="departFrom"]:checked')).map(e => e.value).join(',');
             const departTo = Array.from(document.querySelectorAll('input[name="departTo"]:checked')).map(e => e.value).join(',');
             const departDate = document.getElementById("departDate").value;
             const returnFrom = Array.from(document.querySelectorAll('input[name="returnFrom"]:checked')).map(e => e.value).join(',');
             const returnDate = document.getElementById("returnDate").value;
             const airlines = document.getElementById("airlines").value;
 
-            const departToStr = departTo ? `/TPE-${departTo}` : '';
+            const departToStr = departTo ? `/${departFrom}-${departTo}` : '';
             const departtDateStr = departDate ? `/${departDate}` : '';
-            const returnToStr = returnFrom ? `/${returnFrom}-TPE` : '';
+            const returnToStr = returnFrom ? `/${returnFrom}-${departFrom}` : '';
             const returntDateStr = returnDate ? `/${returnDate}` : '';
 
             const link = `https://www.tw.kayak.com/flights${departToStr}${departtDateStr}${returnToStr}${returntDateStr}/?&sort=price_a&fs=airlines=${airlines}`;
