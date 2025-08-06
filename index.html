@@ -14,7 +14,9 @@
             margin-bottom: 10px;
             align-items: flex-end;
         }
-        .date-group, .flex-group {
+
+        .date-group,
+        .flex-group {
             display: flex;
             flex-direction: column;
         }
@@ -197,16 +199,16 @@
             "-3U,TW,HO,HU,HX,BX,MF,UO,MU,9C,ZH,FM,NX,KE,CA,OZ,7C,CX,CZ,HB,LJ",
             "QH,MH,AC,AE,EK,B7,VN,NH,VU,BC,JL,JX,BR,SQ,CI,H1,TG,TK,PG",
         ];
-    // Flatpickr JS
-    const flatpickrScript = document.createElement('script');
-    flatpickrScript.src = "https://cdn.jsdelivr.net/npm/flatpickr";
-    document.head.appendChild(flatpickrScript);
+        // Flatpickr JS
+        const flatpickrScript = document.createElement('script');
+        flatpickrScript.src = "https://cdn.jsdelivr.net/npm/flatpickr";
+        document.head.appendChild(flatpickrScript);
 
-    flatpickrScript.onload = function() {
-        const today = new Date().toISOString().split('T')[0];
-        flatpickr("#departDatePicker", {dateFormat: "Y-m-d", minDate: today});
-        flatpickr("#returnDatePicker", {dateFormat: "Y-m-d", minDate: today});
-    };
+        flatpickrScript.onload = function () {
+            const today = new Date().toISOString().split('T')[0];
+            flatpickr("#departDatePicker", { dateFormat: "Y-m-d", minDate: today });
+            flatpickr("#returnDatePicker", { dateFormat: "Y-m-d", minDate: today });
+        };
         function createCheckboxTable(containerId, name, IATAsList) {
             // Number of columes is the number of values
             // Number of rows is the max length of values in values_list
@@ -292,14 +294,14 @@
         populateSelect('favoriteReturnDates', favoriteReturnDates);
 
         // 預設勾選 TPE，並自動生成連結
-        window.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('DOMContentLoaded', function () {
             const tpeCheckbox = document.getElementById('departFrom-TPE');
             if (tpeCheckbox) tpeCheckbox.checked = true;
             generateLink();
         });
 
         // 當選擇 favoriteDepartDates 時，自動填入日期和 flexible days，並自動生成連結
-        document.getElementById('favoriteDepartDates').addEventListener('change', function() {
+        document.getElementById('favoriteDepartDates').addEventListener('change', function () {
             const val = this.value;
             if (!val) return;
             const [date, ...flexible] = val.split('-flexible');
@@ -309,7 +311,7 @@
         });
 
         // 當選擇 favoriteReturnDates 時，自動填入日期和 flexible days，並自動生成連結
-        document.getElementById('favoriteReturnDates').addEventListener('change', function() {
+        document.getElementById('favoriteReturnDates').addEventListener('change', function () {
             const val = this.value;
             if (!val) return;
             const [date, ...flexible] = val.split('-flexible');
@@ -363,11 +365,12 @@
             const vzLink = `https://th.vietjetair.com/select-flight-cheap?tripType=roundtrip&currency=twd&from_where=${departFrom}&start=${vzStartDate}&to_where=${departTo}&end=${vzEndDate}&adultCount=1&childCount=0&infantCount=0&promoCode=&findLowestFare=1`;
 
             document.getElementById("generatedLink").innerHTML = `
-                <a href="${kayakLink}" target="_blank">${kayakLink}</a><br><br>
-                <a href="${vzLink}" target="_blank">${vzLink.replace('\&', '&amp;')}</a><br>
-            `;
+                    <a href="${kayakLink}" target="_blank">${kayakLink}</a><br><br>
+                    <a href="${vzLink}" target="_blank">${vzLink.replace('\&', '&amp;')}</a><br>
+                `;
         }
 
     </script>
-</body><br>
+</body>
+
 </html>
