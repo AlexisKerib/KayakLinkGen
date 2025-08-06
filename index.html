@@ -5,6 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KayakLinkGen</title>
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        .date-flex-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 10px;
+            align-items: flex-end;
+        }
+        .date-group, .flex-group {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
 </head>
 
 <body>
@@ -15,19 +29,58 @@
         <label for="departTo">Depart To:</label><br>
         <div id="departToContainer"></div><br>
 
-        <label for="departDate">Depart Date:</label><br>
-        <select id="departDate" name="departDate"></select><br><br>
+        <div class="date-flex-container">
+            <div class="date-group">
+                <label for="departDate">Depart Date:</label>
+                <input type="date" id="departDatePicker" name="departDatePicker">
+            </div>
+            <div class="flex-group">
+                <label for="departDateFlex">Flexible Days:</label>
+                <select id="departDateFlex" name="departDateFlex">
+                    <option value="">None</option>
+                    <option value="-flexible-1day-before">-flexible-1day-before</option>
+                    <option value="-flexible-1day-after">-flexible-1day-after</option>
+                    <option value="-flexible-1day">-flexible-1day</option>
+                    <option value="-flexible-2days">-flexible-2days</option>
+                    <option value="-flexible-3days">-flexible-3days</option>
+                </select>
+            </div>
+        </div>
+        <label for="favoriteDepartDates">Favorite Depart Dates:</label><br>
+        <select id="favoriteDepartDates" name="favoriteDepartDates">
+            <option value="">Select a favorite depart date</option>
+        </select><br><br>
 
         <label for="returnFrom">Return From:</label><br>
         <div id="returnFromContainer"></div><br>
 
-        <label for="returnDate">Return Date:</label><br>
-        <select id="returnDate" name="returnDate"></select><br><br>
+        <div class="date-flex-container">
+            <div class="date-group">
+                <label for="returnDate">Return Date:</label>
+                <input type="date" id="returnDatePicker" name="returnDatePicker">
+            </div>
+            <div class="flex-group">
+                <label for="returnDateFlex">Flexible Days:</label>
+                <select id="returnDateFlex" name="returnDateFlex">
+                    <option value="">None</option>
+                    <option value="-flexible-1day-before">-flexible-1day-before</option>
+                    <option value="-flexible-1day-after">-flexible-1day-after</option>
+                    <option value="-flexible-1day">-flexible-1day</option>
+                    <option value="-flexible-2days">-flexible-2days</option>
+                    <option value="-flexible-3days">-flexible-3days</option>
+                </select>
+            </div>
+        </div>
+
+        <label for="favoriteReturnDates">Favorite Return Dates:</label><br>
+        <select id="favoriteReturnDates" name="favoriteReturnDates">
+            <option value="">Select a favorite return date</option>
+        </select><br><br>
 
         <label for="airlines">Airlines:</label><br>
         <select id="airlines" name="airlines"></select><br><br>
 
-        <button type="button" onclick="generateLink()">Generate Link</button>
+        <!-- 自動生成連結，無需按鈕 -->
     </form>
 
     <div id="generatedLink"></div>
@@ -107,45 +160,53 @@
         ];
         const destSea = ["CNX", "BKK", "DMK", "HKT", "KBV", "HDY", "LGK", "AOR", "PEN", "IPH", "KUL", "SIN", "PQC"];
         const destSeaVisa = ["HAN", "DAD", "SGN", "CRK", "MNL", "CEB", "BWN", "PNH", "CGK", "SUB", "DPS"];
-        const dates = [
-            "",
+        const favoriteDepartDates = [
             "2025-09-26-flexible-1day",
-            "2025-10-05-flexible-3day",
+            "2025-10-05-flexible-3days",
             "2025-12-24-flexible-1day",
             "2025-12-31-flexible-1day",
-            "2026-02-24-flexible-3day",
-            "2026-03-31-flexible-3day",
+            "2026-02-24-flexible-3days",
+            "2026-03-31-flexible-3days",
             "2026-04-02-flexible-1day",
-            "2026-04-28-flexible-3day",
-            "2026-06-16-flexible-3day",
-            "2026-09-22-flexible-3day",
-            "2026-10-06-flexible-3day",
+            "2026-04-28-flexible-3days",
+            "2026-06-16-flexible-3days",
+            "2026-09-22-flexible-3days",
+            "2026-10-06-flexible-3days",
             "2026-10-23-flexible-1day",
-            "2026-12-22-flexible-3day",
+            "2026-12-22-flexible-3days",
         ];
-        const returnDates = [
-            "",
+        const favoriteReturnDates = [
             "2025-09-30-flexible-1day",
-            "2025-10-11-flexible-3day",
+            "2025-10-11-flexible-3days",
             "2025-10-26-flexible-1day-after",
             "2025-12-29-flexible-1day",
             "2026-01-05-flexible-1day",
             "2026-03-02-flexible-1day",
             "2026-04-07-flexible-1day",
-            "2026-04-10-flexible-3day",
-            "2026-05-05-flexible-2day",
-            "2026-06-23-flexible-2day",
-            "2026-10-01-flexible-3day",
-            "2026-10-13-flexible-2day",
-            "2026-10-29-flexible-3day",
-            "2026-12-30-flexible-3day",
-            "2027-01-04-flexible-3day",
+            "2026-04-10-flexible-3days",
+            "2026-05-05-flexible-2days",
+            "2026-06-23-flexible-2days",
+            "2026-10-01-flexible-3days",
+            "2026-10-13-flexible-2days",
+            "2026-10-29-flexible-3days",
+            "2026-12-30-flexible-3days",
+            "2027-01-04-flexible-3days",
         ];
         const airlinesOptions = [
             "-3U,PR,TW,HO,HU,HX,BX,Z2,MF,UO,MU,9C,ZH,5J,FM,NX,KE,CA,OZ,7C,CX,CZ,HB,LJ",
             "-3U,TW,HO,HU,HX,BX,MF,UO,MU,9C,ZH,FM,NX,KE,CA,OZ,7C,CX,CZ,HB,LJ",
             "QH,MH,AC,AE,EK,B7,VN,NH,VU,BC,JL,JX,BR,SQ,CI,H1,TG,TK,PG",
         ];
+    // Flatpickr JS
+    const flatpickrScript = document.createElement('script');
+    flatpickrScript.src = "https://cdn.jsdelivr.net/npm/flatpickr";
+    document.head.appendChild(flatpickrScript);
+
+    flatpickrScript.onload = function() {
+        const today = new Date().toISOString().split('T')[0];
+        flatpickr("#departDatePicker", {dateFormat: "Y-m-d", minDate: today});
+        flatpickr("#returnDatePicker", {dateFormat: "Y-m-d", minDate: today});
+    };
         function createCheckboxTable(containerId, name, IATAsList) {
             // Number of columes is the number of values
             // Number of rows is the max length of values in values_list
@@ -226,20 +287,68 @@
             });
         }
 
+        // Populate favorite date dropdowns
+        populateSelect('favoriteDepartDates', favoriteDepartDates);
+        populateSelect('favoriteReturnDates', favoriteReturnDates);
+
+        // 預設勾選 TPE，並自動生成連結
+        window.addEventListener('DOMContentLoaded', function() {
+            const tpeCheckbox = document.getElementById('departFrom-TPE');
+            if (tpeCheckbox) tpeCheckbox.checked = true;
+            generateLink();
+        });
+
+        // 當選擇 favoriteDepartDates 時，自動填入日期和 flexible days，並自動生成連結
+        document.getElementById('favoriteDepartDates').addEventListener('change', function() {
+            const val = this.value;
+            if (!val) return;
+            const [date, ...flexible] = val.split('-flexible');
+            document.getElementById('departDatePicker').value = date;
+            document.getElementById('departDateFlex').value = flexible.length ? '-flexible' + flexible.join('-flexible') : '';
+            generateLink();
+        });
+
+        // 當選擇 favoriteReturnDates 時，自動填入日期和 flexible days，並自動生成連結
+        document.getElementById('favoriteReturnDates').addEventListener('change', function() {
+            const val = this.value;
+            if (!val) return;
+            const [date, ...flexible] = val.split('-flexible');
+            document.getElementById('returnDatePicker').value = date;
+            document.getElementById('returnDateFlex').value = flexible.length ? '-flexible' + flexible.join('-flexible') : '';
+            generateLink();
+        });
+
+        // 監聽所有表單欄位自動生成連結
+        function addAutoGenerateListeners() {
+            const form = document.getElementById('flightSearchForm');
+            form.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('change', generateLink);
+            });
+        }
+        window.addEventListener('DOMContentLoaded', addAutoGenerateListeners);
+
         createCheckboxTable('departFromContainer', 'departFrom', [["TPE", "TSA", "RMQ", "KHH"]]);
         createCheckboxTable('departToContainer', 'departTo', [destHokkaido, destTohoku, destKanto, destChubu, destKinki, destChugokuShikoku, destKyushuOkinawa, destSea, destSeaVisa]);
         createCheckboxTable('returnFromContainer', 'returnFrom', [destHokkaido, destTohoku, destKanto, destChubu, destKinki, destChugokuShikoku, destKyushuOkinawa, destSea, destSeaVisa]);
-        populateSelect('departDate', dates);
-        populateSelect('returnDate', returnDates);
         populateSelect('airlines', airlinesOptions);
 
         function generateLink() {
             const departFrom = Array.from(document.querySelectorAll('input[name="departFrom"]:checked')).map(e => e.value).join(',');
             const departTo = Array.from(document.querySelectorAll('input[name="departTo"]:checked')).map(e => e.value).join(',');
-            const departDate = document.getElementById("departDate").value;
+            const departDateRaw = document.getElementById("departDatePicker").value;
+            const departDateFlex = document.getElementById("departDateFlex").value;
+            const departDate = departDateRaw + departDateFlex;
             const returnFrom = Array.from(document.querySelectorAll('input[name="returnFrom"]:checked')).map(e => e.value).join(',');
-            const returnDate = document.getElementById("returnDate").value;
+            const returnDateRaw = document.getElementById("returnDatePicker").value;
+            const returnDateFlex = document.getElementById("returnDateFlex").value;
+            const returnDate = returnDateRaw + returnDateFlex;
             const airlines = document.getElementById("airlines").value;
+
+            // 檢查出發日期是否大於回程日期
+            if (departDateRaw && returnDateRaw && departDateRaw > returnDateRaw) {
+                document.getElementById("generatedLink").innerHTML = '<span style="color:red">出發日期不可晚於回程日期！</span>';
+                return;
+            }
 
             const departToStr = departTo ? `/${departFrom}-${departTo}` : '';
             const departtDateStr = departDate ? `/${departDate}` : '';
