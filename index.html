@@ -8,6 +8,41 @@
     <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Cascadia Code', 'Consolas', 'Monaco',
+                'Droid Sans Mono', 'Courier New', Courier,
+                'Microsoft JhengHei UI', 'Microsoft YaHei UI',
+                'PingFang SC', 'Hiragino Sans GB',
+                -apple-system, BlinkMacSystemFont,
+                "Segoe UI", "Microsoft JhengHei", "Microsoft YaHei",
+                "Heiti TC", "Heiti SC", "PingFang SC", "Hiragino Sans GB",
+                "WenQuanYi Micro Hei", sans-serif;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            padding: 10px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            cursor: pointer;
+        }
+
         .date-flex-container {
             display: flex;
             gap: 20px;
@@ -24,6 +59,7 @@
 </head>
 
 <body>
+    <button class="theme-toggle" id="themeToggle">Toggle Dark Mode</button>
     <form id="flightSearchForm">
         <label for="departFrom">Depart To:</label><br>
         <div id="departFromContainer"></div><br>
@@ -370,6 +406,21 @@
                 `;
         }
 
+        // Check for saved theme preference in localStorage
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark'); // Default to dark theme
+        }
+
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
     </script>
 </body>
 
