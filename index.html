@@ -355,11 +355,19 @@
             const returnToStr = returnFrom ? `/${returnFrom}-${departFrom}` : '';
             const returntDateStr = returnDate ? `/${returnDate}` : '';
 
-            const link = `https://www.tw.kayak.com/flights${departToStr}${departtDateStr}${returnToStr}${returntDateStr}/?&sort=price_a&fs=airlines=${airlines}`;
-            document.getElementById("generatedLink").innerHTML = `<a href="${link}" target="_blank">${link}</a>`;
+            const kayakLink = `https://www.tw.kayak.com/flights${departToStr}${departtDateStr}${returnToStr}${returntDateStr}/?&sort=price_a&fs=airlines=${airlines}`;
+
+            // Thai Vietjet Air link generation
+            const vzStartDate = departDateRaw ? departDateRaw.split('-').reverse().join('%2F') : '';
+            const vzEndDate = returnDateRaw ? returnDateRaw.split('-').reverse().join('%2F') : '';
+            const vzLink = `https://th.vietjetair.com/select-flight-cheap?tripType=roundtrip&currency=twd&from_where=${departFrom}&start=${vzStartDate}&to_where=${departTo}&end=${vzEndDate}&adultCount=1&childCount=0&infantCount=0&promoCode=&findLowestFare=1`;
+
+            document.getElementById("generatedLink").innerHTML = `
+                <a href="${kayakLink}" target="_blank">${kayakLink}</a><br><br>
+                <a href="${vzLink}" target="_blank">${vzLink.replace('\&', '&amp;')}</a><br>
+            `;
         }
 
     </script>
-</body>
-
+</body><br>
 </html>
