@@ -4,210 +4,716 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KayakLinkGen</title>
+    <title>Kayak Link Generator</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css" id="flatpickr-theme">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <style>
         :root {
-            --bg-color: #ffffff;
-            --text-color: #000000;
+            /* Light Theme */
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-secondary: #4b5563;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --border-color: #e5e7eb;
+            --input-bg: #f9fafb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 0.75rem;
+            --accent: #10b981;
         }
 
         [data-theme="dark"] {
-            --bg-color: #121212;
-            --text-color: #ffffff;
+            /* Dark Theme */
+            --bg-color: #111827;
+            --card-bg: #1f2937;
+            --text-main: #f9fafb;
+            --text-secondary: #9ca3af;
+            --primary: #60a5fa;
+            --primary-hover: #3b82f6;
+            --border-color: #374151;
+            --input-bg: #374151;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --accent: #34d399;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Cascadia Code', 'Consolas', 'Monaco',
-                'Droid Sans Mono', 'Courier New', Courier,
-                'Microsoft JhengHei UI', 'Microsoft YaHei UI',
-                'PingFang SC', 'Hiragino Sans GB',
-                -apple-system, BlinkMacSystemFont,
-                "Segoe UI", "Microsoft JhengHei", "Microsoft YaHei",
-                "Heiti TC", "Heiti SC", "PingFang SC", "Hiragino Sans GB",
-                "WenQuanYi Micro Hei", sans-serif;
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
         }
 
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-bottom: 50px;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+            letter-spacing: -0.025em;
+        }
+
+        /* Theme Toggle */
         .theme-toggle {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
-            padding: 10px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            border: 1px solid var(--text-color);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Cards and Layout */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Forms & Inputs */
+        label {
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.625rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Flex Groups for Dates */
+        .date-row {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+            margin-bottom: 1rem;
+        }
+
+        /* Map Section */
+        #mapContainer {
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 2px solid var(--border-color);
+            height: 450px;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .map-mode-btns {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            background: var(--input-bg);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            width: fit-content;
+        }
+
+        .map-mode-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .map-mode-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Custom Table Styling for Checkboxes */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            background: var(--input-bg);
+            border-radius: 0.375rem 0.375rem 0 0;
+        }
+
+        td {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        td:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Compact layout for Depart From section */
+        #departFromContainer table {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        #departFromContainer tr {
+            display: contents;
+        }
+
+        #departFromContainer th {
+            display: none;
+        }
+
+        #departFromContainer td {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            background: var(--input-bg);
+        }
+
+        #departFromContainer td:hover {
+            border-color: var(--primary);
+        }
+
+        /* Checkbox styling enhancement */
+        input[type="checkbox"] {
+            accent-color: var(--primary);
+            width: 1rem;
+            height: 1rem;
+            margin-right: 0.5rem;
             cursor: pointer;
         }
 
-        .date-flex-container {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 10px;
-            align-items: flex-end;
+        .checkbox-label {
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
         }
 
-        .date-group,
-        .flex-group {
+        /* Collapsible */
+        .collapsible-header {
+            width: 100%;
+            text-align: left;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            cursor: pointer;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .collapsible-header:hover {
+            background-color: var(--border-color);
+        }
+
+        .collapsible-header::after {
+            content: '+';
+            font-size: 1.25rem;
+        }
+
+        .collapsible-header.active::after {
+            content: '-';
+        }
+
+        .collapsible-content {
+            display: none;
+            padding: 1rem 0;
+            overflow: hidden;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .collapsible-content.open {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Generated Link Section */
+        #generatedLink {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--primary);
+            margin-top: 2rem;
+            word-break: break-all;
+            position: sticky;
+            bottom: 20px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        #generatedLink.collapsed {
+            padding: 0.75rem 1.5rem;
+        }
+
+        #generatedLink .link-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        #generatedLink .link-header:hover {
+            opacity: 0.8;
+        }
+
+        #generatedLink .toggle-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        #generatedLink.collapsed .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        #generatedLink .link-content-wrapper {
+            max-height: 500px;
+            overflow: hidden;
+            transition: max-height 0.3s ease, margin-top 0.3s ease;
+            margin-top: 10px;
+        }
+
+        #generatedLink.collapsed .link-content-wrapper {
+            max-height: 0;
+            margin-top: 0;
+        }
+
+        #generatedLink a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        #generatedLink a:hover {
+            text-decoration: underline;
+        }
+
+        /* Utility Buttons */
+        .action-btn {
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            margin-left: 0.5rem;
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Custom Map Popup */
+        .leaflet-popup-content-wrapper {
+            background: var(--card-bg) !important;
+            color: var(--text-main) !important;
+            border-radius: var(--radius) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+            padding: 0 !important;
+            border: 1px solid var(--border-color);
+        }
+
+        .leaflet-popup-tip {
+            background: var(--card-bg) !important;
+        }
+
+        .leaflet-popup-content {
+            margin: 0 !important;
+            line-height: 1.5;
+        }
+
+        .airport-popup {
+            padding: 12px 16px;
+            min-width: 160px;
+        }
+
+        .airport-popup-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .airport-popup-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-main);
+        }
+
+        .airport-popup-iata {
+            background: var(--primary);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .airport-popup-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+            color: var(--text-light);
+        }
+
+        .airport-popup-status {
+            font-weight: 500;
+        }
+
+        .helper-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
         }
     </style>
 </head>
 
 <body>
-    <button class="theme-toggle" id="themeToggle">Toggle Dark Mode</button>
-    <form id="flightSearchForm">
-        <label for="departFrom">Depart To:</label><br>
-        <div id="departFromContainer"></div>
-        <div style="margin-top:6px;">
-            <label for="customDepartFrom">自訂出發機場 (IATA):</label>
-            <input type="text" id="customDepartFrom" name="customDepartFrom" maxlength="3" placeholder="e.g., HUN" style="text-transform:uppercase; width: 90px;">
+    <div class="container">
+        <header>
+            <h1>✈️ Kayak Link Generator</h1>
+            <button class="theme-toggle" id="themeToggle">
+                <span>🌗 Mode</span>
+            </button>
+        </header>
+
+        <form id="flightSearchForm">
+            <!-- Map Section -->
+            <section class="card">
+                <h2>Interactive Map Selection</h2>
+                <div class="map-mode-btns">
+                    <button type="button" id="mapModeDepartTo" class="map-mode-btn active"
+                        onclick="setMapMode('departTo')">Destinations (Depart To)</button>
+                    <button type="button" id="mapModeReturnFrom" class="map-mode-btn"
+                        onclick="setMapMode('returnFrom')">Origins (Return From)</button>
+                </div>
+                <div id="mapContainer">
+                    <div id="map"></div>
+                </div>
+            </section>
+
+            <!-- Depart From Section -->
+            <section class="card">
+                <h2>Depart From (Origin)</h2>
+                <div id="departFromContainer"></div>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label for="customDepartFrom">Depart From (IATA)</label>
+                    <input type="text" id="customDepartFrom" name="customDepartFrom" placeholder="e.g., TPE,TSA,RMQ"
+                        style="text-transform:uppercase;">
+                    <div class="helper-text">Use checkbox list above or type IATA codes separated by comma. Edits sync
+                        both ways.</div>
+                </div>
+            </section>
+
+            <!-- Depart To Section -->
+            <section class="card">
+                <h2>Depart To (Destination)</h2>
+                <button type="button" class="collapsible-header"
+                    onclick="toggleCollapsible('departToCollapsible', this)">
+                    Show/Hide Selection List
+                </button>
+                <div id="departToCollapsible" class="collapsible-content">
+                    <div id="departToContainer"></div>
+                </div>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label for="customDepartTo">Depart To (IATA)</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="customDepartTo" name="customDepartTo" placeholder="e.g., CTS,NRT,BKK"
+                            style="text-transform:uppercase; flex: 1;">
+                        <button type="button" class="action-btn" onclick="copyDepartToToReturnFrom()">Copy to Return
+                            From ↓</button>
+                    </div>
+                    <div class="helper-text">Use checkbox list above or type IATA codes separated by comma. Edits sync
+                        both ways.</div>
+                </div>
+
+                <div class="date-row">
+                    <div class="form-group">
+                        <label for="departDatePicker">Depart Date</label>
+                        <input type="date" id="departDatePicker" name="departDatePicker">
+                    </div>
+                    <div class="form-group">
+                        <label for="departDateFlex">Flexible Days</label>
+                        <select id="departDateFlex" name="departDateFlex">
+                            <option value="">None</option>
+                            <option value="-flexible-1day-before">-flexible-1day-before</option>
+                            <option value="-flexible-1day-after">-flexible-1day-after</option>
+                            <option value="-flexible-1day">-flexible-1day</option>
+                            <option value="-flexible-2days">-flexible-2days</option>
+                            <option value="-flexible-3days">-flexible-3days</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="favoriteDepartDates">Favorite Depart Dates</label>
+                        <select id="favoriteDepartDates" name="favoriteDepartDates">
+                            <option value="">Select a favorite depart date</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Return From Section -->
+            <section class="card">
+                <h2>Return From (Origin)</h2>
+                <button type="button" class="collapsible-header"
+                    onclick="toggleCollapsible('returnFromCollapsible', this)">
+                    Show/Hide Selection List
+                </button>
+                <div id="returnFromCollapsible" class="collapsible-content">
+                    <div id="returnFromContainer"></div>
+                </div>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label for="customReturnFrom">Return From (IATA)</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="customReturnFrom" name="customReturnFrom" placeholder="e.g., CTS,NRT,BKK"
+                            style="text-transform:uppercase; flex: 1;">
+                        <button type="button" class="action-btn" onclick="copyReturnFromToDepartTo()">Copy to Depart To
+                            ↑</button>
+                    </div>
+                    <div class="helper-text">Use checkbox list above or type IATA codes separated by comma. Edits sync
+                        both ways.</div>
+                </div>
+
+                <div class="date-row">
+                    <div class="form-group">
+                        <label for="returnDatePicker">Return Date</label>
+                        <input type="date" id="returnDatePicker" name="returnDatePicker">
+                    </div>
+                    <div class="form-group">
+                        <label for="returnDateFlex">Flexible Days</label>
+                        <select id="returnDateFlex" name="returnDateFlex">
+                            <option value="">None</option>
+                            <option value="-flexible-1day-before">-flexible-1day-before</option>
+                            <option value="-flexible-1day-after">-flexible-1day-after</option>
+                            <option value="-flexible-1day">-flexible-1day</option>
+                            <option value="-flexible-2days">-flexible-2days</option>
+                            <option value="-flexible-3days">-flexible-3days</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="favoriteReturnDates">Favorite Return Dates</label>
+                        <select id="favoriteReturnDates" name="favoriteReturnDates">
+                            <option value="">Select a favorite return date</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="customReturnTo">Other Return To (IATA)</label>
+                    <input type="text" id="customReturnTo" name="customReturnTo" placeholder="e.g., TPE,TSA"
+                        style="text-transform:uppercase; max-width: 300px;">
+                    <div class="helper-text">If left empty, defaults to your Depart From location.</div>
+                </div>
+            </section>
+
+            <!-- Airlines Section -->
+            <section class="card">
+                <h2>Airlines Filter</h2>
+                <div class="form-group">
+                    <label for="airlines">Select Airline Code String</label>
+                    <select id="airlines" name="airlines"></select>
+                </div>
+            </section>
+        </form>
+    </div>
+
+    <!-- Sticky Footer for generated link -->
+    <div id="generatedLink">
+        <div class="link-header" onclick="toggleGeneratedLink()">
+            <div style="font-weight: bold; color: var(--text-secondary);">Generated Links</div>
+            <span class="toggle-icon">▼</span>
         </div>
-        <br>
-
-        <label for="departTo">Depart To:</label><br>
-        <div id="departToContainer"></div><br>
-
-        <div class="date-flex-container">
-            <div class="date-group">
-                <label for="departDate">Depart Date:</label>
-                <input type="date" id="departDatePicker" name="departDatePicker">
-            </div>
-            <div class="flex-group">
-                <label for="departDateFlex">Flexible Days:</label>
-                <select id="departDateFlex" name="departDateFlex">
-                    <option value="">None</option>
-                    <option value="-flexible-1day-before">-flexible-1day-before</option>
-                    <option value="-flexible-1day-after">-flexible-1day-after</option>
-                    <option value="-flexible-1day">-flexible-1day</option>
-                    <option value="-flexible-2days">-flexible-2days</option>
-                    <option value="-flexible-3days">-flexible-3days</option>
-                </select>
-            </div>
+        <div class="link-content-wrapper">
+            <div id="linkContent">Links will appear here...</div>
         </div>
-        <label for="favoriteDepartDates">Favorite Depart Dates:</label><br>
-        <select id="favoriteDepartDates" name="favoriteDepartDates">
-            <option value="">Select a favorite depart date</option>
-        </select><br><br>
+    </div>
 
-        <label for="returnFrom">Return From:</label><br>
-        <div id="returnFromContainer"></div><br>
-
-        <div class="date-flex-container">
-            <div class="date-group">
-                <label for="returnDate">Return Date:</label>
-                <input type="date" id="returnDatePicker" name="returnDatePicker">
-            </div>
-            <div class="flex-group">
-                <label for="returnDateFlex">Flexible Days:</label>
-                <select id="returnDateFlex" name="returnDateFlex">
-                    <option value="">None</option>
-                    <option value="-flexible-1day-before">-flexible-1day-before</option>
-                    <option value="-flexible-1day-after">-flexible-1day-after</option>
-                    <option value="-flexible-1day">-flexible-1day</option>
-                    <option value="-flexible-2days">-flexible-2days</option>
-                    <option value="-flexible-3days">-flexible-3days</option>
-                </select>
-            </div>
-        </div>
-
-        <label for="favoriteReturnDates">Favorite Return Dates:</label><br>
-        <select id="favoriteReturnDates" name="favoriteReturnDates">
-            <option value="">Select a favorite return date</option>
-        </select><br><br>
-
-        <label for="airlines">Airlines:</label><br>
-        <select id="airlines" name="airlines"></select><br><br>
-
-        <!-- 自動生成連結，無需按鈕 -->
-    </form>
-
-    <div id="generatedLink"></div>
 
     <script>
-        const destHokkaido = [
-            "WKJ_稚内+", // 45.41
-            "MMB_女満別+", // 43.90
-            "MBE_紋別+",  // 44.35
-            "AKJ_旭川",  // 43.30
-            "SHB_中標津+", // 43.55
-            "KUH_釧路+", // 43.00
-            "OBO_帯広+", // 42.92
-            "CTS_新千歳", // 42.78
-            "HKD_函館",  // 41.77
-        ];
-        const destTohoku = [
-            "MSJ_三沢+", // 40.69
-            "AOJ_青森", // 40.82
-            "ONJ_大館能代+", // 40.20
-            "AXT_秋田", // 39.72
-            "HNA_花巻", // 39.42
-            "SYO_庄内+", // 38.81
-            "GAJ_山形+", // 38.39
-            "SDJ_仙台", // 38.26
-            "FKS_福島", // 37.23
-            "IBR_小美玉", // 36.17
-        ];
-        const destKanto = [
-            "HND_羽田",
-            "NRT_成田",
-            "HAC_八丈島+"
-        ];
-        const destChubu = [
-            "KIJ_新潟", // 37.91
-            "NTQ_能登+", // 37.32
-            "TOY_富山+", // 36.65
-            "KMQ_小松", // 36.39
-            "NKM_小牧", // 36.39
-            "NGO_中部国際", // 34.98
-        ];
-        const destKinki = [
-            "KIX_関西",
-            "ITM_大阪+",
-            "UKB_神戸",
-            "SHM_南紀白浜+"
-        ];
-        const destChugokuShikoku = [
-            "TTJ_鳥取+", // 35.52
-            "YGJ_米子+", // 35.49
-            "IZO_出雲+", // 35.37
-            "OKJ_岡山", // 34.78
-            "HIJ_広島", // 34.43
-            "IWJ_萩・石見+", // 34.38
-            "UBJ_山口宇部+", // 33.93
-            "IWK_岩国+", // 34.18
-            "TAK_高松", // 34.34
-            "TKS_徳島+", // 34.12
-            "MYJ_松山", // 33.82
-            "KCZ_高知", // 33.55
-        ];
-        const destKyushuOkinawa = [
-            "FUK_福岡", // 33.59
-            "HSG_佐賀", // 33.24
-            "KKJ_北九州+", // 33.85
-            "OIT_大分+", // 33.23
-            "NGS_長崎+", // 32.75
-            "KMJ_熊本", // 32.82
-            "KMI_宮崎", // 31.86
-            "KOJ_鹿児島+", // 31.80
-            "ASJ_奄美+", // 28.43
-            "OKA_那覇", // 26.21
-            "UEO_久米島+", // 26.35
-            "MMY_宮古+", // 24.79
-            "SHI_下地島+", // 24.75
-            "ISG_石垣+"  // 24.34
-        ];
-        const destSea = ["CNX", "BKK", "DMK", "HKT", "KBV", "HDY", "LGK", "AOR", "PEN", "IPH", "KUL", "SIN", "PQC"];
-        const destSeaVisa = ["HAN", "DAD", "SGN", "CRK", "MNL", "CEB", "BWN", "PNH", "CGK", "SUB", "DPS"];
+        // Unified airport data: { IATA: [漢字/中文, 是否轉機, lat, lng] }
+        const airports = {
+            // Taiwan (Depart From)
+            TPE: ["桃園", 0, 25.07, 121.23], TSA: ["松山", 0, 25.07, 121.55], RMQ: ["台中", 0, 24.26, 120.59], KHH: ["高雄", 0, 22.57, 120.35],
+            // Hokkaido
+            WKJ: ["稚内", 1, 45.40, 141.80], MMB: ["女満別", 1, 43.88, 144.16], MBE: ["紋別", 1, 44.30, 143.40],
+            AKJ: ["旭川", 0, 43.67, 142.45], SHB: ["中標津", 1, 43.58, 144.96], KUH: ["釧路", 1, 43.04, 144.19],
+            OBO: ["帯広", 1, 42.73, 143.22], CTS: ["新千歳", 0, 42.77, 141.69], HKD: ["函館", 0, 41.77, 140.82],
+            // Tohoku
+            MSJ: ["三沢", 1, 40.70, 141.37], AOJ: ["青森", 0, 40.73, 140.69], ONJ: ["大館能代", 1, 40.19, 140.35],
+            AXT: ["秋田", 0, 39.61, 140.22], HNA: ["花巻", 0, 39.43, 141.13], SYO: ["庄内", 1, 38.81, 139.78],
+            GAJ: ["山形", 1, 38.41, 140.37], SDJ: ["仙台", 0, 38.14, 140.92], FKS: ["福島", 0, 37.22, 140.43], IBR: ["茨城", 0, 36.18, 140.41],
+            // Kanto
+            HND: ["羽田", 0, 35.54, 139.77], NRT: ["成田", 0, 35.77, 140.39], HAC: ["八丈島", 1, 33.11, 139.78],
+            // Chubu
+            KIJ: ["新潟", 0, 37.95, 139.11], NTQ: ["能登", 1, 37.29, 136.95], TOY: ["富山", 1, 36.64, 137.18],
+            KMQ: ["小松", 0, 36.39, 136.40], NKM: ["小牧", 1, 35.25, 136.92], NGO: ["中部", 0, 34.85, 136.81], FSZ: ["靜岡", 1, 34.80, 138.19],
+            // Kinki
+            KIX: ["関西", 0, 34.43, 135.23], ITM: ["伊丹", 1, 34.78, 135.44], UKB: ["神戸", 0, 34.63, 135.22], SHM: ["南紀白浜", 1, 33.66, 135.36],
+            // Chugoku/Shikoku
+            TTJ: ["鳥取", 1, 35.53, 134.16], YGJ: ["米子", 0, 35.49, 133.23], IZO: ["出雲", 1, 35.41, 132.88],
+            OKJ: ["岡山", 0, 34.75, 133.85], HIJ: ["広島", 0, 34.44, 132.91], IWJ: ["萩石見", 1, 34.67, 131.79],
+            UBJ: ["山口宇部", 1, 33.93, 131.28], IWK: ["岩国", 1, 34.14, 132.23], TAK: ["高松", 0, 34.21, 134.01],
+            TKS: ["徳島", 1, 34.13, 134.60], MYJ: ["松山", 1, 33.82, 132.69], KCZ: ["高知", 0, 33.54, 133.67],
+            // Kyushu/Okinawa
+            FUK: ["福岡", 0, 33.58, 130.45], HSG: ["佐賀", 0, 33.15, 130.30], KKJ: ["北九州", 0, 33.84, 131.03],
+            OIT: ["大分", 0, 33.47, 131.73], NGS: ["長崎", 1, 32.91, 129.91], KMJ: ["熊本", 0, 32.83, 130.85],
+            KMI: ["宮崎", 0, 31.87, 131.44], KOJ: ["鹿児島", 0, 31.80, 130.71], ASJ: ["奄美", 1, 28.43, 129.71],
+            OKA: ["那覇", 0, 26.19, 127.64], UEO: ["久米島", 1, 26.36, 126.71], MMY: ["宮古", 1, 24.78, 125.29],
+            SHI: ["下地島", 1, 24.82, 125.14], ISG: ["石垣", 0, 24.40, 124.24],
+            // SEA (No Visa)
+            CRK: ["克拉克", 0, 15.18, 120.56], MNL: ["馬尼拉", 0, 14.50, 121.01], CEB: ["宿霧", 0, 10.30, 123.97],
+            CNX: ["清邁", 0, 18.76, 98.96], BKK: ["曼谷素萬納普", 0, 13.69, 100.75], DMK: ["曼谷廊曼", 0, 13.91, 100.60],
+            HKT: ["普吉", 0, 8.11, 98.30], KBV: ["喀比", 0, 8.09, 98.98], HDY: ["合艾", 0, 6.93, 100.39],
+            LGK: ["蘭卡威", 0, 6.32, 99.73], AOR: ["亞羅士打", 1, 6.19, 100.39], PEN: ["檳城", 0, 5.29, 100.27],
+            IPH: ["怡保", 0, 4.56, 101.09], KUL: ["吉隆坡", 0, 2.74, 101.69], BKI: ["沙巴", 0, 5.93, 116.05], KCH: ["古晉", 1, 1.48, 110.35],
+            SIN: ["新加坡", 0, 1.36, 103.99],
+            PQC: ["富國島", 0, 10.16, 103.99], VTE: ["永珍", 0, 17.98, 102.56],
+            MPH: ["長灘島", 0, 11.92, 121.95],
+            // SEA (Visa Required)
+            HAN: ["河內", 0, 21.22, 105.80], DAD: ["峴港", 0, 16.04, 108.19], SGN: ["胡志明", 0, 10.81, 106.65], CXR: ["芽莊", 0, 11.99, 109.22],
+            BWN: ["汶萊", 0, 4.94, 114.93], PNH: ["金邊", 0, 11.54, 104.84], CGK: ["雅加達", 0, -6.12, 106.65],
+            SUB: ["泗水", 0, -7.37, 112.78], DPS: ["峇里島", 0, -8.74, 115.16]
+        };
+
+        // Helper functions
+        const getDisplayName = (code) => {
+            const ap = airports[code];
+            if (!ap) return code;
+            const suffix = ap[1] ? '+' : '';
+            return `${code}_${ap[0]}${suffix}`;
+        };
+        const getCoords = (code) => airports[code] ? [airports[code][2], airports[code][3]] : null;
+        const isTransfer = (code) => airports[code]?.[1] === 1;
+
+        // Region groupings (using IATA codes only)
+        const destHokkaido = ["WKJ", "MMB", "MBE", "AKJ", "SHB", "KUH", "OBO", "CTS", "HKD"].map(getDisplayName);
+        const destTohoku = ["MSJ", "AOJ", "ONJ", "AXT", "HNA", "SYO", "GAJ", "SDJ", "FKS", "IBR"].map(getDisplayName);
+        const destKanto = ["HND", "NRT", "HAC"].map(getDisplayName);
+        const destChubu = ["KIJ", "NTQ", "TOY", "KMQ", "NKM", "NGO", "FSZ"].map(getDisplayName);
+        const destKinki = ["KIX", "ITM", "UKB", "SHM"].map(getDisplayName);
+        const destChugokuShikoku = ["TTJ", "YGJ", "IZO", "OKJ", "HIJ", "IWJ", "UBJ", "IWK", "TAK", "TKS", "MYJ", "KCZ"].map(getDisplayName);
+        const destKyushuOkinawa = ["FUK", "HSG", "KKJ", "OIT", "NGS", "KMJ", "KMI", "KOJ", "ASJ", "OKA", "UEO", "MMY", "SHI", "ISG"].map(getDisplayName);
+        const destSea = ["CRK", "MNL", "CEB", "MPH", "CNX", "BKK", "DMK", "HKT", "KBV", "HDY", "VTE", "LGK", "AOR", "PEN", "IPH", "KUL", "BKI", "KCH", "SIN", "PQC"].map(getDisplayName);
+        const destSeaVisa = ["HAN", "DAD", "CXR", "SGN", "BWN", "PNH", "CGK", "SUB", "DPS"].map(getDisplayName);
+
+        // Legacy compatibility: airportCoords object derived from airports
+        const airportCoords = Object.fromEntries(Object.entries(airports).map(([k, v]) => [k, [v[2], v[3]]]));
+
         const favoriteDepartDates = [
-            "2025-09-26-flexible-1day",
-            "2025-10-05-flexible-3days",
-            "2025-12-24-flexible-1day",
-            "2025-12-31-flexible-1day",
             "2026-02-24-flexible-3days",
             "2026-03-31-flexible-3days",
             "2026-04-02-flexible-1day",
@@ -219,11 +725,6 @@
             "2026-12-22-flexible-3days",
         ];
         const favoriteReturnDates = [
-            "2025-09-30-flexible-1day",
-            "2025-10-11-flexible-3days",
-            "2025-10-26-flexible-1day-after",
-            "2025-12-29-flexible-1day",
-            "2026-01-05-flexible-1day",
             "2026-03-02-flexible-1day",
             "2026-04-07-flexible-1day",
             "2026-04-10-flexible-3days",
@@ -240,6 +741,7 @@
             "-3U,TW,HO,HU,HX,BX,MF,UO,MU,9C,ZH,FM,NX,KE,CA,OZ,7C,CX,CZ,HB,LJ,PR,Z2,5J",
             "QH,MH,AC,AE,EK,B7,VN,NH,VU,BC,JL,JX,BR,SQ,CI,H1,TG,TK,PG",
         ];
+
         // Flatpickr JS
         const flatpickrScript = document.createElement('script');
         flatpickrScript.src = "https://cdn.jsdelivr.net/npm/flatpickr";
@@ -250,17 +752,8 @@
             flatpickr("#departDatePicker", { dateFormat: "Y-m-d", minDate: today });
             flatpickr("#returnDatePicker", { dateFormat: "Y-m-d", minDate: today });
         };
-        function createCheckboxTable(containerId, name, IATAsList) {
-            // Number of columes is the number of values
-            // Number of rows is the max length of values in values_list
-            // The table shows as:
-            // | --- | --- | --- |
-            // | CTS | BKK | HAN |
-            // | AKJ | DMK | DAD |
-            // | HKD | CNX | SGN |
-            // | ... | ... | ... |
-            // | --- | --- | --- |
 
+        function createCheckboxTable(containerId, name, IATAsList) {
             const container = document.getElementById(containerId);
             const table = document.createElement('table');
             const headerRow = document.createElement('tr');
@@ -268,21 +761,40 @@
             // Create header row with "Select All" checkboxes
             IATAsList.forEach((IATAs, colIndex) => {
                 const headerCell = document.createElement('th');
-                headerCell.style.textAlign = 'left';
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.alignItems = 'center';
+
                 const selectAllCheckbox = document.createElement('input');
                 selectAllCheckbox.type = 'checkbox';
                 selectAllCheckbox.id = `${name}-selectAll-${colIndex}`;
+                // Keep reference to handle map updates later
+                selectAllCheckbox.setAttribute('data-select-all-group', `${name}-group-${colIndex}`);
+
                 selectAllCheckbox.addEventListener('change', function () {
                     const checkboxes = document.querySelectorAll(`input[name="${name}"][data-col="${colIndex}"]`);
                     checkboxes.forEach(checkbox => checkbox.checked = selectAllCheckbox.checked);
+
+                    // Sync to text input for departTo and returnFrom
+                    if (name === 'departTo') {
+                        syncCheckboxesToInput('departTo', 'customDepartTo');
+                    } else if (name === 'returnFrom') {
+                        syncCheckboxesToInput('returnFrom', 'customReturnFrom');
+                    }
+
+                    generateLink(); // Update link on select all
+                    if (map) updateMapMarkers();
                 });
 
                 const label = document.createElement('label');
                 label.htmlFor = selectAllCheckbox.id;
                 label.textContent = 'Select All';
+                label.className = 'checkbox-label';
+                label.style.fontWeight = 'bold';
 
-                headerCell.appendChild(selectAllCheckbox);
-                headerCell.appendChild(label);
+                div.appendChild(selectAllCheckbox);
+                div.appendChild(label);
+                headerCell.appendChild(div);
                 headerRow.appendChild(headerCell);
             });
 
@@ -299,19 +811,26 @@
                     const IATA = IATAsList[j][i];
 
                     if (IATA !== undefined) {
+                        const div = document.createElement('div');
+                        div.style.display = 'flex';
+                        div.style.alignItems = 'center';
+
                         const checkbox = document.createElement('input');
                         checkbox.type = 'checkbox';
-                        checkbox.id = `${name}-${IATA}`;
+                        const code = IATA.split("_")[0];
+                        checkbox.id = `${name}-${code}`;
                         checkbox.name = name;
-                        checkbox.value = IATA.split("_")[0];
+                        checkbox.value = code;
                         checkbox.setAttribute('data-col', j);
 
                         const label = document.createElement('label');
                         label.htmlFor = checkbox.id;
                         label.textContent = IATA;
+                        label.className = 'checkbox-label';
 
-                        cell.appendChild(checkbox);
-                        cell.appendChild(label);
+                        div.appendChild(checkbox);
+                        div.appendChild(label);
+                        cell.appendChild(div);
                     }
                     row.appendChild(cell);
                 }
@@ -361,11 +880,87 @@
             generateLink();
         });
 
+        // Toggle generated link section
+        function toggleGeneratedLink() {
+            const linkSection = document.getElementById('generatedLink');
+            linkSection.classList.toggle('collapsed');
+        }
+
+        // ========== Two-way Sync: Checkboxes <-> Text Input ==========
+
+        // Update text input from checkbox selections
+        function syncCheckboxesToInput(checkboxName, inputId) {
+            const checkedCodes = Array.from(document.querySelectorAll(`input[name="${checkboxName}"]:checked`)).map(cb => cb.value);
+            document.getElementById(inputId).value = checkedCodes.join(',');
+        }
+
+        // Update checkboxes from text input (and keep any codes not in checkbox list)
+        function syncInputToCheckboxes(inputId, checkboxName) {
+            const inputEl = document.getElementById(inputId);
+            const rawValue = (inputEl.value || '').toUpperCase();
+            const codes = rawValue.split(',').map(s => s.trim()).filter(s => /^[A-Z]{3}$/.test(s));
+
+            // Get all available checkbox codes
+            const allCheckboxes = document.querySelectorAll(`input[name="${checkboxName}"]`);
+            const availableCodes = new Set();
+            allCheckboxes.forEach(cb => availableCodes.add(cb.value));
+
+            // Uncheck all first
+            allCheckboxes.forEach(cb => cb.checked = false);
+
+            // Check matching ones
+            codes.forEach(code => {
+                const checkbox = document.getElementById(`${checkboxName}-${code}`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            });
+
+            // Update map markers
+            if (map) updateMapMarkers();
+            generateLink();
+        }
+
         // 監聽所有表單欄位自動生成連結
         function addAutoGenerateListeners() {
             const form = document.getElementById('flightSearchForm');
             form.querySelectorAll('input, select').forEach(el => {
                 el.addEventListener('change', generateLink);
+            });
+
+            // Sync checkboxes -> text input when departFrom checkboxes change
+            document.querySelectorAll('input[name="departFrom"]').forEach(cb => {
+                cb.addEventListener('change', function () {
+                    syncCheckboxesToInput('departFrom', 'customDepartFrom');
+                });
+            });
+
+            // Sync checkboxes -> text input when departTo or returnFrom checkboxes change
+            document.querySelectorAll('input[name="departTo"]').forEach(cb => {
+                cb.addEventListener('change', function () {
+                    syncCheckboxesToInput('departTo', 'customDepartTo');
+                    if (map) updateMapMarkers();
+                });
+            });
+
+            document.querySelectorAll('input[name="returnFrom"]').forEach(cb => {
+                cb.addEventListener('change', function () {
+                    syncCheckboxesToInput('returnFrom', 'customReturnFrom');
+                    if (map) updateMapMarkers();
+                });
+            });
+
+            // Sync text input -> checkboxes when user types (on input event for real-time)
+            document.getElementById('customDepartFrom').addEventListener('input', function () {
+                syncInputToCheckboxes('customDepartFrom', 'departFrom');
+            });
+
+            document.getElementById('customDepartTo').addEventListener('input', function () {
+                syncInputToCheckboxes('customDepartTo', 'departTo');
+            });
+
+            document.getElementById('customReturnFrom').addEventListener('input', function () {
+                syncInputToCheckboxes('customReturnFrom', 'returnFrom');
             });
         }
         window.addEventListener('DOMContentLoaded', addAutoGenerateListeners);
@@ -375,33 +970,57 @@
         createCheckboxTable('returnFromContainer', 'returnFrom', [destHokkaido, destTohoku, destKanto, destChubu, destKinki, destChugokuShikoku, destKyushuOkinawa, destSea, destSeaVisa]);
         populateSelect('airlines', airlinesOptions);
 
-        function generateLink() {
-            const departFromChecked = Array.from(document.querySelectorAll('input[name="departFrom"]:checked')).map(e => e.value);
-            const customDepartFromRaw = (document.getElementById("customDepartFrom")?.value || '').trim().toUpperCase();
-            const departFromParts = [...departFromChecked];
-            if (customDepartFromRaw && /^[A-Z]{3}$/.test(customDepartFromRaw)) {
-                departFromParts.push(customDepartFromRaw);
+        // Set default checked for TPE and sync initial state
+        window.addEventListener('DOMContentLoaded', function () {
+            // Default: check TPE
+            const tpeCheckbox = document.getElementById('departFrom-TPE');
+            if (tpeCheckbox) {
+                tpeCheckbox.checked = true;
             }
-            const departFrom = departFromParts.join(',');
-            const departTo = Array.from(document.querySelectorAll('input[name="departTo"]:checked')).map(e => e.value).join(',');
+            // Sync initial checkbox state to text input
+            syncCheckboxesToInput('departFrom', 'customDepartFrom');
+        });
+
+        // Helper: parse comma-separated IATA codes
+        function parseCustomIATA(inputId) {
+            const raw = (document.getElementById(inputId)?.value || '').trim().toUpperCase();
+            if (!raw) return [];
+            return raw.split(',').map(s => s.trim()).filter(s => /^[A-Z]{3}$/.test(s));
+        }
+
+        function generateLink() {
+            // Depart From - now uses the synced text input directly
+            const departFrom = parseCustomIATA('customDepartFrom').join(',');
+
+            // Depart To - now uses the synced text input directly
+            const departTo = parseCustomIATA('customDepartTo').join(',');
+
+            // Return From - now uses the synced text input directly
+            const returnFrom = parseCustomIATA('customReturnFrom').join(',');
+
+            // Return To (defaults to departFrom if not specified)
+            const customReturnToList = parseCustomIATA('customReturnTo');
+            const returnTo = customReturnToList.length > 0 ? customReturnToList.join(',') : departFrom;
+
             const departDateRaw = document.getElementById("departDatePicker").value;
             const departDateFlex = document.getElementById("departDateFlex").value;
             const departDate = departDateRaw + departDateFlex;
-            const returnFrom = Array.from(document.querySelectorAll('input[name="returnFrom"]:checked')).map(e => e.value).join(',');
             const returnDateRaw = document.getElementById("returnDatePicker").value;
             const returnDateFlex = document.getElementById("returnDateFlex").value;
             const returnDate = returnDateRaw + returnDateFlex;
             const airlines = document.getElementById("airlines").value;
 
+            const linkContent = document.getElementById("linkContent");
+
             // 檢查出發日期是否大於回程日期
             if (departDateRaw && returnDateRaw && departDateRaw > returnDateRaw) {
-                document.getElementById("generatedLink").innerHTML = '<span style="color:red">出發日期不可晚於回程日期！</span>';
+                linkContent.innerHTML = '<span style="color:#ef4444; font-weight:bold;">⚠️ 出發日期不可晚於回程日期！ (Depart date must be before return date)</span>';
                 return;
             }
 
             const departToStr = departTo ? `/${departFrom}-${departTo}` : '';
             const departtDateStr = departDate ? `/${departDate}` : '';
-            const returnToStr = returnFrom ? `/${returnFrom}-${departFrom}` : '';
+            const returnToStr = returnFrom ? `/${returnFrom}-${returnTo}` : '';
             const returntDateStr = returnDate ? `/${returnDate}` : '';
 
             const kayakLink = `https://www.tw.kayak.com/flights${departToStr}${departtDateStr}${returnToStr}${returntDateStr}/?&sort=price_a&fs=airlines=${airlines}`;
@@ -411,9 +1030,17 @@
             const vzEndDate = returnDateRaw ? returnDateRaw.split('-').reverse().join('%2F') : '';
             const vzLink = `https://th.vietjetair.com/select-flight-cheap?tripType=roundtrip&currency=twd&from_where=${departFrom}&start=${vzStartDate}&to_where=${departTo}&end=${vzEndDate}&adultCount=1&childCount=0&infantCount=0&promoCode=&findLowestFare=1`;
 
-            document.getElementById("generatedLink").innerHTML = `
-                    <a href="${kayakLink}" target="_blank">${kayakLink}</a><br><br>
-                    <a href="${vzLink}" target="_blank">${vzLink.replace('\&', '&amp;')}</a><br>
+            linkContent.innerHTML = `
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <div>
+                            <span style="background:#ff690f; color:white; padding:2px 6px; border-radius:4px; font-size:0.8em; margin-right:8px;">KAYAK</span>
+                            <a href="${kayakLink}" target="_blank">${kayakLink}</a>
+                        </div>
+                        <div>
+                            <span style="background:#d31e1e; color:white; padding:2px 6px; border-radius:4px; font-size:0.8em; margin-right:8px;">Vietjet</span>
+                            <a href="${vzLink}" target="_blank">${vzLink.replace('\&', '&amp;')}</a>
+                        </div>
+                    </div>
                 `;
         }
 
@@ -431,7 +1058,277 @@
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
+            if (map) {
+                setTimeout(() => map.invalidateSize(), 300);
+            }
         });
+
+        // ---------------- MAP LOGIC ----------------
+        let map;
+        let mapMarkers = {};
+        let currentMapTarget = 'departTo'; // 'departTo' or 'returnFrom' - default to departTo
+
+        function initMap() {
+            if (map) return;
+            map = L.map('map').setView([25, 125], 4); // Center broadly on Asia/Japan
+
+            // Add OpenStreetMap tiles - dark mode friendly tiles if possible, but standard is fine
+            // We can check theme and switch tiles, but let's stick to standard for now or use a neutral one
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+        }
+
+        // Initialize map on page load
+        window.addEventListener('DOMContentLoaded', function () {
+            initMap();
+            setTimeout(() => {
+                map.invalidateSize();
+                updateMapMarkers();
+            }, 100);
+        });
+
+        // Set map mode (departTo or returnFrom)
+        function setMapMode(mode) {
+            currentMapTarget = mode;
+
+            // Update button styles
+            document.getElementById('mapModeDepartTo').classList.remove('active');
+            document.getElementById('mapModeReturnFrom').classList.remove('active');
+
+            if (mode === 'departTo') {
+                document.getElementById('mapModeDepartTo').classList.add('active');
+            } else {
+                document.getElementById('mapModeReturnFrom').classList.add('active');
+            }
+
+            updateMapMarkers();
+        }
+
+        // Toggle collapsible sections
+        function toggleCollapsible(id, btnElement) {
+            const content = document.getElementById(id);
+            const isOpen = content.classList.contains('open');
+
+            content.classList.toggle('open');
+            btnElement.classList.toggle('active');
+        }
+
+        function updateMapMarkers() {
+            if (!map) return;
+
+            // clear existing markers
+            for (let code in mapMarkers) {
+                map.removeLayer(mapMarkers[code]);
+            }
+            mapMarkers = {};
+
+            // Get currently checked items
+            const checkedBoxes = document.querySelectorAll(`input[name="${currentMapTarget}"]:checked`);
+            const checkedCodes = new Set(Array.from(checkedBoxes).map(cb => cb.value));
+
+            // Populate markers
+            // Iterate over all checkboxes in the target container to find valid codes
+            const allCheckboxes = document.querySelectorAll(`input[name="${currentMapTarget}"]`);
+            const relevantCodes = new Set();
+            allCheckboxes.forEach(cb => relevantCodes.add(cb.value));
+
+            // Helper function to create and add a marker
+            const createMarker = (code) => {
+                const isSelected = checkedCodes.has(code);
+                const needsTransfer = isTransfer(code);
+                const ap = airports[code];
+                const displayName = ap ? ap[0] : code;
+
+                // Color: Green if selected, Blue if not selected
+                const color = isSelected ? '#10b981' : '#3b82f6';
+                const radius = isSelected ? 14 : 10;  // Larger markers
+                const fillOpacity = isSelected ? 0.9 : 0.7;
+
+                let marker;
+                if (needsTransfer) {
+                    // Triangle shape for transfer airports (using DivIcon with CSS triangle)
+                    const size = isSelected ? 24 : 18;  // Larger triangles
+                    const triangleIcon = L.divIcon({
+                        className: 'triangle-marker',
+                        html: `<div style="
+                            width: 0; 
+                            height: 0; 
+                            border-left: ${size / 2}px solid transparent;
+                            border-right: ${size / 2}px solid transparent;
+                            border-bottom: ${size}px solid ${color};
+                            filter: drop-shadow(0 0 2px rgba(255,255,255,0.8));
+                        "></div>`,
+                        iconSize: [size, size],
+                        iconAnchor: [size / 2, size]
+                    });
+                    marker = L.marker(airportCoords[code], { icon: triangleIcon, zIndexOffset: 0 }).addTo(map);
+                } else {
+                    // Circle for direct flight airports (higher z-index to be on top)
+                    marker = L.circleMarker(airportCoords[code], {
+                        color: 'white',
+                        fillColor: color,
+                        fillOpacity: fillOpacity,
+                        weight: 2,
+                        radius: radius
+                    }).addTo(map);
+                    marker.bringToFront();
+                }
+
+                const typeIcon = needsTransfer ? '▲' : '●';
+                const typeText = needsTransfer ? '需轉機' : '直飛';
+                const typeColor = needsTransfer ? '#f59e0b' : '#3b82f6';
+
+                const selectIcon = isSelected ? '✓' : '👆';
+                const selectText = isSelected ? '已選取' : '點擊選取';
+                const selectColor = isSelected ? '#10b981' : 'var(--text-secondary)';
+
+                const popupContent = `
+                    <div class="airport-popup">
+                        <div class="airport-popup-header">
+                            <span class="airport-popup-name">${displayName}</span>
+                            <span class="airport-popup-iata">${code}</span>
+                        </div>
+                        <div class="airport-popup-row">
+                            <span style="color: ${typeColor}">${typeIcon}</span>
+                            <span class="airport-popup-status" style="color: ${typeColor}">${typeText}</span>
+                        </div>
+                        <div class="airport-popup-row" style="color: ${selectColor}">
+                            <span>${selectIcon}</span>
+                            <span>${selectText}</span>
+                        </div>
+                    </div>
+                `;
+                marker.bindPopup(popupContent, {
+                    offset: [0, -10],       // Move popup up
+                    autoPan: false,          // Don't auto-pan map
+                    closeOnClick: true       // Close when clicking elsewhere
+                });
+
+                marker.on('click', () => {
+                    toggleSelection(code);
+                });
+
+                // Use mouseover to show popup, but don't close on mouseout to prevent flickering
+                marker.on('mouseover', function (e) {
+                    this.openPopup();
+                });
+
+                // Anti-flicker: track if mouse is on popup
+                let isMouseOnPopup = false;
+                let closeTimeout = null;
+
+                // Close popup only when mouse leaves both marker and popup
+                const tryClosePopup = (markerRef) => {
+                    if (closeTimeout) clearTimeout(closeTimeout);
+                    closeTimeout = setTimeout(() => {
+                        const popup = markerRef.getPopup();
+                        if (popup && !isMouseOnPopup) {
+                            const popupEl = popup.getElement();
+                            const markerEl = markerRef._path || markerRef._icon;
+                            const isOverPopup = popupEl && popupEl.matches(':hover');
+                            const isOverMarker = markerEl && markerEl.matches(':hover');
+                            if (!isOverPopup && !isOverMarker) {
+                                markerRef.closePopup();
+                            }
+                        }
+                    }, 150);
+                };
+
+                marker.on('mouseout', function (e) {
+                    tryClosePopup(this);
+                });
+
+                // Attach popup events after popup opens
+                marker.on('popupopen', function (e) {
+                    const popupEl = e.popup.getElement();
+                    if (popupEl) {
+                        popupEl.addEventListener('mouseenter', () => {
+                            isMouseOnPopup = true;
+                            if (closeTimeout) clearTimeout(closeTimeout);
+                        });
+                        popupEl.addEventListener('mouseleave', () => {
+                            isMouseOnPopup = false;
+                            tryClosePopup(marker);
+                        });
+                    }
+                });
+
+                mapMarkers[code] = marker;
+            };
+
+            // First pass: Add transfer airports (triangles) - they will be below
+            relevantCodes.forEach(code => {
+                if (airportCoords[code] && isTransfer(code)) {
+                    createMarker(code);
+                }
+            });
+
+            // Second pass: Add direct flight airports (circles) - they will be on top
+            relevantCodes.forEach(code => {
+                if (airportCoords[code] && !isTransfer(code)) {
+                    createMarker(code);
+                }
+            });
+        }
+
+        function toggleSelection(code) {
+            if (!currentMapTarget) return;
+
+            // Find the checkbox
+            const checkbox = document.getElementById(`${currentMapTarget}-${code}`);
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+
+                // Sync to text input
+                const inputId = currentMapTarget === 'departTo' ? 'customDepartTo' : 'customReturnFrom';
+                syncCheckboxesToInput(currentMapTarget, inputId);
+
+                generateLink(); // Update link
+
+                // Update marker visual
+                updateMapMarkers();
+            }
+        }
+
+        // Copy Depart To selections to Return From
+        function copyDepartToToReturnFrom() {
+            // Copy checkboxes
+            const departToCheckboxes = document.querySelectorAll('input[name="departTo"]');
+            departToCheckboxes.forEach(cb => {
+                const returnFromCb = document.getElementById(`returnFrom-${cb.value}`);
+                if (returnFromCb) {
+                    returnFromCb.checked = cb.checked;
+                }
+            });
+
+            // Copy custom input
+            const customDepartTo = document.getElementById('customDepartTo').value;
+            document.getElementById('customReturnFrom').value = customDepartTo;
+
+            generateLink();
+            if (currentMapTarget === 'returnFrom') updateMapMarkers();
+        }
+
+        // Copy Return From selections to Depart To
+        function copyReturnFromToDepartTo() {
+            // Copy checkboxes
+            const returnFromCheckboxes = document.querySelectorAll('input[name="returnFrom"]');
+            returnFromCheckboxes.forEach(cb => {
+                const departToCb = document.getElementById(`departTo-${cb.value}`);
+                if (departToCb) {
+                    departToCb.checked = cb.checked;
+                }
+            });
+
+            // Copy custom input
+            const customReturnFrom = document.getElementById('customReturnFrom').value;
+            document.getElementById('customDepartTo').value = customReturnFrom;
+
+            generateLink();
+            if (currentMapTarget === 'departTo') updateMapMarkers();
+        }
+
     </script>
 </body>
 
