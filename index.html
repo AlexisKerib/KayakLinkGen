@@ -62,7 +62,12 @@
     <button class="theme-toggle" id="themeToggle">Toggle Dark Mode</button>
     <form id="flightSearchForm">
         <label for="departFrom">Depart To:</label><br>
-        <div id="departFromContainer"></div><br>
+        <div id="departFromContainer"></div>
+        <div style="margin-top:6px;">
+            <label for="customDepartFrom">自訂出發機場 (IATA):</label>
+            <input type="text" id="customDepartFrom" name="customDepartFrom" maxlength="3" placeholder="e.g., HUN" style="text-transform:uppercase; width: 90px;">
+        </div>
+        <br>
 
         <label for="departTo">Depart To:</label><br>
         <div id="departToContainer"></div><br>
@@ -371,7 +376,13 @@
         populateSelect('airlines', airlinesOptions);
 
         function generateLink() {
-            const departFrom = Array.from(document.querySelectorAll('input[name="departFrom"]:checked')).map(e => e.value).join(',');
+            const departFromChecked = Array.from(document.querySelectorAll('input[name="departFrom"]:checked')).map(e => e.value);
+            const customDepartFromRaw = (document.getElementById("customDepartFrom")?.value || '').trim().toUpperCase();
+            const departFromParts = [...departFromChecked];
+            if (customDepartFromRaw && /^[A-Z]{3}$/.test(customDepartFromRaw)) {
+                departFromParts.push(customDepartFromRaw);
+            }
+            const departFrom = departFromParts.join(',');
             const departTo = Array.from(document.querySelectorAll('input[name="departTo"]:checked')).map(e => e.value).join(',');
             const departDateRaw = document.getElementById("departDatePicker").value;
             const departDateFlex = document.getElementById("departDateFlex").value;
